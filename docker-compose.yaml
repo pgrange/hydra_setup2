@@ -1,0 +1,89 @@
+version: "3.9"
+
+services:
+  cardano-node:
+    image: inputoutput/cardano-node:latest
+    restart: always
+    volumes:
+      - ./mainnet_cardano_var:/srv/var/cardano/
+      - ./cardano-configurations/network/mainnet:/srv/etc/cardano
+    environment:
+      - CARDANO_SOCKET_PATH=/srv/var/cardano/node.socket      # used by cardano-node
+      - CARDANO_NODE_SOCKET_PATH=/srv/var/cardano/node.socket # used by cardano-cli
+    command:
+      [ "run"
+      , "--config", "/srv/etc/cardano/cardano-node/config.json"
+      , "--topology", "/srv/etc/cardano/cardano-node/topology.json"
+      , "--database-path", "/srv/var/cardano/db"
+      ]
+
+  hydra-node:
+    image: ghcr.io/input-output-hk/hydra-node:unstable
+    restart: always
+    volumes:
+      - ./mainnet_cardano_var:/srv/var/cardano/
+      - ./cardano-configurations/network/mainnet:/srv/etc/cardano
+      - ./hydra-configuration:/srv/etc/hydra
+      - ./local_peers:/srv/etc/hydra/peers
+      - ./local_secrets:/srv/var/hydra/secrets
+    ports:
+      - "5001:5001"
+    command:
+      [ "--node-id", "12043"
+      , "--api-host", "0.0.0.0"
+      , "--host", "0.0.0.0"
+      , "--hydra-scripts-tx-id", "${HYDRA_SCRIPTS_TX_ID}"
+      , "--hydra-signing-key", "/srv/var/hydra/secrets/hydra.sk"
+      , "--cardano-signing-key", "/srv/var/hydra/secrets/cardano.sk"
+      , "--ledger-genesis", "/srv/etc/cardano/genesis/shelley.json"
+      , "--ledger-protocol-parameters", "/srv/etc/hydra/protocol-parameters.json"
+      , "--mainnet"
+      , "--node-socket", "/srv/var/cardano/node.socket"
+      # Add peers below this line
+      ## Arnaud
+      , "--peer", "35.233.17.169:5001"
+      , "--hydra-verification-key", "/srv/etc/hydra/arnaud.hydra.vk"
+      , "--cardano-verification-key", "/srv/etc/hydra/arnaud.cardano.vk"
+      ## Sebastian
+      , "--peer", "fk.ncoding.at:5001"
+      , "--hydra-verification-key", "/srv/etc/hydra/sebastian.hydra.vk"
+      , "--cardano-verification-key", "/srv/etc/hydra/sebastian.cardano.vk"
+      ## Pascal
+      , "--peer", "13.39.80.222:5001"
+      , "--hydra-verification-key", "/srv/etc/hydra/pascal.hydra.vk"
+      , "--cardano-verification-key", "/srv/etc/hydra/pascal.cardano.vk"
+      ## Sasha
+      , "--peer", "13.38.49.252:5001"
+      , "--hydra-verification-key", "/srv/etc/hydra/sasha.hydra.vk"
+      , "--cardano-verification-key", "/srv/etc/hydra/sasha.cardano.vk"
+      ]
+    
+  hydra-tui:
+    image: ghcr.io/input-output-hk/hydra-tui:unstable
+    profiles:
+      - tui
+    command:
+      [ 
+        "--"
+      , "--connect", "hydra-node:4001"
+      , "--node-socket", "/srv/var/cardano/node.socket"
+      , "--mainnet"
+      , "--cardano-signing-key", "/srv/var/hydra/secrets/cardano.sk"
+      ]
+    volumes:
+      - ./mainnet_cardano_var:/srv/var/cardano/
+      - ./local_secrets:/srv/var/hydra/secrets
+
+  hydraw:
+    image: ghcr.io/input-output-hk/hydraw:unstable
+    profiles:
+      - hydraw
+    entrypoint:
+      [ "hydraw" ]
+    environment:
+      - HYDRAW_CARDANO_SIGNING_KEY=/srv/var/hydra/secrets/cardano.sk
+      - HYDRA_API_HOST=hydra-node:4001
+    volumes:
+      - ./local_secrets:/srv/var/hydra/secrets
+    ports:
+      - "80:1337"
