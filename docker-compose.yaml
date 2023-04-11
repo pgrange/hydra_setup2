@@ -63,9 +63,7 @@ services:
     profiles:
       - tui
     command:
-      [ 
-        "--"
-      , "--connect", "hydra-node:4001"
+      [ "--connect", "hydra-node:4001"
       , "--node-socket", "/srv/var/cardano/node.socket"
       , "--mainnet"
       , "--cardano-signing-key", "/srv/var/hydra/secrets/cardano.sk"
