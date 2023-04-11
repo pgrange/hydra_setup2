@@ -1,0 +1,13 @@
+#!/bin/bash
+
+docker run -it \
+  -v $PWD/mainnet_cardano_var:/mainnet_cardano_var       \
+  -v $PWD/cardano-configurations:/cardano-configurations \
+  -v $PWD/hydra-configuration:/hydra-configuration       \
+  -v $PWD/local_peers:/local_peers                       \
+  -v $PWD/local_secrets:/local_secrets                   \
+  -e CARDANO_NODE_SOCKET_PATH=mainnet_cardano_var/node.socket \
+  inputoutput/cardano-node cli "$@"
+
+# query UTxO
+# ./cardano_cli query utxo --address  $(cat local_secrets/cardano.addr) --mainnet
