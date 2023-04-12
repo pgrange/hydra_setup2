@@ -1,3 +1,4 @@
 mainnet_cardano_var
 local_peers
 local_secrets
+work_dir
