@@ -28,6 +28,7 @@ services:
       - ./local_secrets:/srv/var/hydra/secrets
     ports:
       - "5001:5001"
+      - "4001:4001"
     command:
       [ "--node-id", "12043"
       , "--api-host", "0.0.0.0"
@@ -76,8 +77,6 @@ services:
     image: ghcr.io/input-output-hk/hydraw:unstable
     profiles:
       - hydraw
-    entrypoint:
-      [ "hydraw" ]
     environment:
       - HYDRAW_CARDANO_SIGNING_KEY=/srv/var/hydra/secrets/cardano.sk
       - HYDRA_API_HOST=hydra-node:4001
