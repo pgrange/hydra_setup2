@@ -18,7 +18,7 @@ services:
       ]
 
   hydra-node:
-    image: ghcr.io/input-output-hk/hydra-node:unstable
+    image: ghcr.io/input-output-hk/hydra-node:latest
     restart: always
     volumes:
       - ./mainnet_cardano_var:/srv/var/cardano/
@@ -60,7 +60,7 @@ services:
       ]
     
   hydra-tui:
-    image: ghcr.io/input-output-hk/hydra-tui:unstable
+    image: ghcr.io/input-output-hk/hydra-tui:latest
     profiles:
       - tui
     command:
@@ -74,7 +74,7 @@ services:
       - ./local_secrets:/srv/var/hydra/secrets
 
   hydraw:
-    image: ghcr.io/input-output-hk/hydraw:unstable
+    image: ghcr.io/input-output-hk/hydraw:latest
     profiles:
       - hydraw
     environment:
